@@ -1,5 +1,10 @@
-// app/api/generate/route.ts
+// src/app/api/generate/route.ts
 import { NextRequest, NextResponse } from "next/server";
+
+interface OllamaModel {
+  name: string;
+  size: number;
+}
 
 export async function POST(request: NextRequest) {
   let projectName = "Unknown Project";
@@ -18,7 +23,7 @@ export async function POST(request: NextRequest) {
     // Format Q&A section
     const qaSection = questions
       .map(
-        (q, i) =>
+        (q: string, i: number) =>
           `**Q${i + 1}:** ${q}\n**A${i + 1}:** ${answers[i] || "No response provided"}`
       )
       .join("\n\n");
@@ -64,8 +69,8 @@ List 8-10 specific functional requirements...
     try {
       const modelResponse = await fetch("http://localhost:11434/api/tags");
       if (modelResponse.ok) {
-        const modelData = await modelResponse.json();
-        const llama3Model = modelData.models?.find((m: any) =>
+        const modelData: { models?: OllamaModel[] } = await modelResponse.json();
+        const llama3Model = modelData.models?.find((m) =>
           m.name.includes("llama3")
         );
         if (llama3Model) {
@@ -73,8 +78,11 @@ List 8-10 specific functional requirements...
           modelInfo = `${llama3Model.name} (${sizeGB}GB)`;
         }
       }
-    } catch (err) {
-      console.warn("⚠️ Could not fetch model info:", err);
+    } catch (fetchError: unknown) {
+      console.warn(
+        "⚠️ Could not fetch model info:",
+        fetchError instanceof Error ? fetchError.message : fetchError
+      );
     }
 
     // Call Ollama generate API
@@ -92,7 +100,7 @@ List 8-10 specific functional requirements...
       throw new Error("Ollama API returned an error");
     }
 
-    const data = await ollamaResponse.json();
+    const data: { response: string } = await ollamaResponse.json();
 
     return NextResponse.json({
       success: true,
@@ -100,8 +108,10 @@ List 8-10 specific functional requirements...
       source: "ollama",
       modelInfo,
     });
-  } catch (error) {
-    console.error("❌ Ollama failed, using fallback:", error);
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : "Unknown error occurred";
+    console.error("❌ Ollama failed, using fallback:", message);
 
     const fallbackOutput = `# EXECUTIVE SUMMARY
 The ${projectName} project aims to address key user needs...

@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const projectName = body.projectName || "Unknown Project";
-    const projectTopic = body.projectTopic || "";
+    const projectName: string = body.projectName || "Unknown Project";
+    const projectTopic: string = body.projectTopic || "";
 
     const prompt = `You are a senior business analyst. Generate exactly 5 focused, comprehensive questions for a business analysis interview about this project:
 
@@ -37,19 +37,19 @@ Make sure the questions:
       );
     }
 
-    const data = await ollamaResponse.json();
+    const data: { response: string } = await ollamaResponse.json();
 
     // Robust question extraction
-    let questions = data.response
+    let questions: string[] = data.response
       .split("\n")
-      .map((line: string) => line.trim())
-      .filter((line: string) =>
+      .map((line) => line.trim())
+      .filter((line) =>
         line.match(/^(\d+[\.\)]|[-*])\s+/) // matches "1.", "1)", "-", "*"
       )
-      .map((line: string) =>
+      .map((line) =>
         line.replace(/^(\d+[\.\)]\s*|[-*]\s*)/, "").trim()
       )
-      .filter((line: string) => line.length > 0)
+      .filter((line) => line.length > 0)
       .slice(0, 5);
 
     // Fallback if Ollama output is junk
@@ -64,11 +64,11 @@ Make sure the questions:
     }
 
     return NextResponse.json({ success: true, questions });
-  } catch (err: any) {
-    console.error("❌ Question route failed:", err);
-    return NextResponse.json(
-      { success: false, error: err.message },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    // ✅ use `unknown` instead of `any`
+    const message =
+      err instanceof Error ? err.message : "Unknown error occurred";
+    console.error("❌ Question route failed:", message);
+    return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }
