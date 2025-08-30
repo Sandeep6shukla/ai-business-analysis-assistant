@@ -53,7 +53,7 @@ Make it professional, detailed, and specific to the project responses provided. 
       const modelResponse = await fetch('http://localhost:11434/api/tags');
       if (modelResponse.ok) {
         const modelData = await modelResponse.json();
-        const llama3Model = modelData.models?.find((m: any) => m.name.includes('llama3'));
+        const llama3Model = modelData.models?.find((m: unknown) => m.name.includes('llama3'));
         if (llama3Model) {
           // Extract size and other details
           const sizeGB = (llama3Model.size / (1024 * 1024 * 1024)).toFixed(1);

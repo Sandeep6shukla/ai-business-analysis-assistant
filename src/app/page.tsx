@@ -47,7 +47,7 @@ export default function Home() {
   
   const {
     transcript,
-    listening,
+    listening: _listening,
     resetTranscript,
     browserSupportsSpeechRecognition
   } = useSpeechRecognition();
