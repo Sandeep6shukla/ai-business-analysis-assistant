@@ -12,11 +12,13 @@
     "html-docx-js": "^0.3.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.2",
+    "lucide-react": "^0.542.0",
     "next": "15.5.2",
     "ollama": "^0.5.17",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-speech-recognition": "^4.0.1"
+    "react-speech-recognition": "^4.0.1",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
